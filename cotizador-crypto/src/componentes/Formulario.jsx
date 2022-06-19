@@ -1,6 +1,7 @@
 import { useState, useEffect} from 'react'
 import styled from '@emotion/styled'
 import useSelectMonedas from '../hooks/useSelectMonedas'
+import Error from './Error'
 import {monedas} from '../data/monedas'
 
 const InputSubmit = styled.input`
@@ -23,9 +24,12 @@ const InputSubmit = styled.input`
     }
 `
 
-const Formulario = () => {
-  const [criptos, setCriptos] = useState([]);
+const Formulario = ({setMonedas}) => {
+  const [criptos, setCriptos] = useState([])
+  const [error, setError] = useState(false);
   const [moneda, SelectMonedas] = useSelectMonedas('Elige tu moneda', monedas)
+  const [criptomoneda, SelectCripromoneda] = useSelectMonedas('Elige tu criptomoneda', criptos)
+
 
   useEffect(() => {
     const consultarAPI = async () => {
@@ -50,12 +54,30 @@ const Formulario = () => {
 
   }, [])
 
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    if ([moneda, criptomoneda].includes('')) {
+      setError(true)
+      return
+    }
+    setError(false)
+    setMonedas({
+      moneda,
+      criptomoneda
+    })
+  }
+
   return (
-    <form>
+    <>
+    {error && <Error>todo campo obliga</Error>}
+    <form
+      onSubmit={handleSubmit}
+    >
         <SelectMonedas />
-        {moneda}
+        <SelectCripromoneda />
         <InputSubmit type='submit' value='Cotizar' />
     </form>
+    </>
   )
 }
 
